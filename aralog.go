@@ -57,7 +57,7 @@ func NewFileLogger(path string, flag int) (*Logger, error) {
 func NewRollFileLogger(path string, maxsize uint, flag int) (*Logger, error) {
 	out, err := os.OpenFile(path, os.O_APPEND|os.O_WRONLY, 0600)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	currentOutFile = out
@@ -67,7 +67,7 @@ func NewRollFileLogger(path string, maxsize uint, flag int) (*Logger, error) {
 		maxsize = 1024 * 1024 * 10
 	}
 
-	return &Logger{out: out, prefix: "", flag: flag, path: path, maxsize: maxsize}
+	return &Logger{out: out, prefix: "", flag: flag, path: path, maxsize: maxsize}, nil
 }
 
 //var std = New(os.Stderr, "", LstdFlags)
@@ -166,7 +166,7 @@ func (l *Logger) output(calldepth int, s string) error {
 		l.buf = append(l.buf, '\n')
 	}
 
-	if l.path != nil {
+	if len(l.path) > 0 {
 		err := l.rollFile(now)
 		if err != nil {
 			return err
@@ -177,7 +177,7 @@ func (l *Logger) output(calldepth int, s string) error {
 }
 
 func (l *Logger) rollFile(now time.Time) error {
-	l.size += len(l.buf)
+	l.size += uint(len(l.buf))
 	// file rotation if size > maxsize
 	if l.size > l.maxsize {
 
@@ -186,15 +186,15 @@ func (l *Logger) rollFile(now time.Time) error {
 			// ignore if Close() failed
 			err := currentOutFile.Close()
 			if err != nil {
-				l.buf = append(l.buf, "*** ARALOGGER ERROR: Close current output file failed, ", err, '\n')
+				l.buf = append(l.buf, []byte("[XXX] ARALOGGER ERROR: Close current output file failed, "), []byte(err.Error()), '\n')
 			}
 		}
 
 		newPath := l.path
 		err := os.Rename(l.path, l.path+now.Year()+now.Month()+now.Day()+now.Hour()+now.Minute()+now.Second())
 		if err != nil {
-			l.buf = append(l.buf, "*** ARALOGGER ERROR: Rolling file failed, ", err, '\n')
-			newPath = l.path + now.Unix()
+			l.buf = append(l.buf, []byte("[XXX] ARALOGGER ERROR: Rolling file failed, "), []byte(err.Error()), '\n')
+			newPath = l.path + string(now.Unix())
 		}
 
 		newOut, err := os.OpenFile(newPath, os.O_APPEND|os.O_WRONLY, 0600)
