@@ -1,2 +1,2 @@
 # aralog
-Log implementation whitch supports file rotation and compress
+Log implementation whitch supports file rotation and compress.
