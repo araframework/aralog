@@ -186,7 +186,7 @@ func (l *Logger) rollFile(now time.Time) error {
 			// ignore if Close() failed
 			err := currentOutFile.Close()
 			if err != nil {
-				l.buf = append(l.buf, "[XXX] ARALOGGER ERROR: Close current output file failed, " + err.Error())
+				l.buf = append(l.buf, ("[XXX] ARALOGGER ERROR: Close current output file failed, " + err.Error())...)
 				l.buf = append(l.buf, '\n')
 			}
 		}
@@ -196,7 +196,7 @@ func (l *Logger) rollFile(now time.Time) error {
 			l.path + string(now.Year()) + string(now.Month()) + string(now.Day()) +
 			string(now.Hour()) + string(now.Minute()) + string(now.Second()))
 		if err != nil {
-			l.buf = append(l.buf, "[XXX] ARALOGGER ERROR: Rolling file failed, " + err.Error())
+			l.buf = append(l.buf, ("[XXX] ARALOGGER ERROR: Rolling file failed, " + err.Error())...)
 			l.buf = append(l.buf, '\n')
 			newPath = l.path + string(now.Unix())
 		}
