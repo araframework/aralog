@@ -185,19 +185,25 @@ func (l *Logger) rollFile(now time.Time) error {
 		if currentOutFile != nil {
 			// ignore if Close() failed
 			err := currentOutFile.Close()
-			if err != nil {
+			if err == nil{
+				// TODO zip it
+			} else {
 				l.buf = append(l.buf, ("[XXX] ARALOGGER ERROR: Close current output file failed, " + err.Error())...)
 				l.buf = append(l.buf, '\n')
 			}
 		}
 
 		newPath := l.path
+
+		// rename l.path to nameYYYYMMDDhhmmss
 		err := os.Rename(l.path,
 			l.path + string(now.Year()) + string(now.Month()) + string(now.Day()) +
 			string(now.Hour()) + string(now.Minute()) + string(now.Second()))
 		if err != nil {
 			l.buf = append(l.buf, ("[XXX] ARALOGGER ERROR: Rolling file failed, " + err.Error())...)
 			l.buf = append(l.buf, '\n')
+
+			// if rename failed, start a new log file with different name
 			newPath = l.path + string(now.Unix())
 		}
 
