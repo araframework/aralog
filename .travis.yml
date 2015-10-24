@@ -5,4 +5,4 @@ go:
   - 1.4
   - tip
 
-script: go get github.com/araframework/aralog
+script: go get github.com/araframework/aralog && go build && go test
